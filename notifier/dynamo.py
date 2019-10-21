@@ -4,7 +4,7 @@ import sys
 
 
 def get_users():
-    # TODO: grab users from DynamoDB
+    print("Retrieving user list..")
     users = []
     with open(os.path.join(sys.path[0], 'users.csv')) as csv_file:
         reader = csv.DictReader(csv_file, delimiter=',')
@@ -13,7 +13,5 @@ def get_users():
             for col in reader.fieldnames:
                 user[col] = row[col]
             users.append(user)
+    print("{} users successfully loaded".format(len(users)))
     return users
-
-
-# get_users()

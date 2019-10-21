@@ -29,10 +29,21 @@ def time_to_notify_user(user, game):
     game_datetime_parsed = parse_game_date(game["gameDate"])
     delta_seconds = (game_datetime_parsed - datetime.utcnow()).total_seconds()
     minutes_to_game_start = delta_seconds / 60
-    return (
+    time_to_notify = (
         minutes_to_game_start <= int(user["MinutesBeforeGameStart"]) and
-        minutes_to_game_start > -10
+        minutes_to_game_start > -5
     )
+    print(
+        "Game ID {game_id} starts in {minutes_to_start} minutes, time to "
+        "notify user {user_sms} about {user_team}? {time_to_notify}".format(
+            game_id=game["gamePk"],
+            minutes_to_start=int(minutes_to_game_start),
+            user_sms=user["SmsNumber"],
+            user_team=user["FavoriteTeam"],
+            time_to_notify=time_to_notify,
+        )
+    )
+    return time_to_notify
 
 
 def convert_utc_to_est_pst_strings(date_time):
@@ -85,4 +96,9 @@ def main():
                     )
 
 
-main()
+def handler(_event, _context):
+    main()
+
+
+if __name__ == "__main__":
+    main()
