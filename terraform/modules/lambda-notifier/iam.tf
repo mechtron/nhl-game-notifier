@@ -50,6 +50,19 @@ resource "aws_iam_role_policy" "send_sns_sms" {
                 "SNS:Publish"
             ],
             "Resource": "*"
+        },
+        {
+            "Sid": "DynamoDbReadUpdate",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:GetItem",
+                "dynamodb:BatchGetItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:PutItem"
+            ],
+            "Resource": "${aws_dynamodb_table.dynamodb_table.arn}"
         }
     ]
 }

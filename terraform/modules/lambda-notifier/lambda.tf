@@ -21,6 +21,12 @@ resource "aws_lambda_function" "lambda_function" {
   environment {
     variables = {
       SNS_TOPIC_ARN = aws_sns_topic.sms_notifications.arn
+      DYNAMODB_ARN = aws_dynamodb_table.dynamodb_table.arn
     }
+  }
+
+  tags = {
+    Name        = var.function_name
+    Environment = var.environment
   }
 }
