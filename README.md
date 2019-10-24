@@ -7,3 +7,5 @@ By Corey Gale (`mechtrondev[at]gmail.com`)
 - Add deployment pipeline
 - Finish readme
 - Move users from CSV file to DynamoDB (with boolean field for SMS number is subscribed)
+- Add CLI tool for creating new users
+
