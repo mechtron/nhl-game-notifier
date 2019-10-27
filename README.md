@@ -6,4 +6,3 @@ By Corey Gale (`mechtrondev[at]gmail.com`)
 
 - Add deployment pipeline
 - Finish readme
-- Remove CSV-related code
