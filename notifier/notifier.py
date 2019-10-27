@@ -37,6 +37,7 @@ def time_to_notify_user(user, game):
     minutes_to_game_start = delta_seconds / 60
     time_to_notify = (
         minutes_to_game_start <= user["minutes_to_notify_before_game"] and
+        minutes_to_game_start > -120 and # Don't notify after 2 hours into game
         not user_was_notified_recently(user)
     )
     print(
