@@ -4,6 +4,8 @@
 notifier/__pycache__
 notifier/venv
 notifier/bin
+
+notifier/argparse*
 notifier/boto*
 notifier/certifi*
 notifier/chardet*
@@ -11,6 +13,7 @@ notifier/dateutil
 notifier/docutils*
 notifier/idna*
 notifier/jmespath*
+notifier/prettytable*
 notifier/python_dateutil*
 notifier/pytz*
 notifier/requests*

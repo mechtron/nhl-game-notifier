@@ -1,45 +1,36 @@
 import os
+import time
 
 import boto3
+
+from dynamo import (
+    update_user_last_notified_date,
+    update_user_sns_subscription_status,
+)
 
 
 SNS_CLIENT = boto3.client('sns')
 SNS_TOPIC_ARN = os.environ.get('SNS_TOPIC_ARN')
 
 
-def get_sns_topic_subscriptions(sns_topic_arn):
-    print("Retrieving SNS topic subscriptions..")
-    response = SNS_CLIENT.list_subscriptions_by_topic(
-        TopicArn=sns_topic_arn,
-    )
-    assert response["ResponseMetadata"]["HTTPStatusCode"] == 200
-    return response["Subscriptions"]
-
-
-def subscribe_sms_number_to_sns_topic(sms_number, sns_topic):
-    print("Subscribing {} to SNS topic..".format(sms_number))
+def subscribe_user_sms_number_to_sns_topic(user, sns_topic):
+    print("Subscribing {} to SNS topic..".format(user["sms_number"]))
     response = SNS_CLIENT.subscribe(
         TopicArn=sns_topic,
         Protocol='sms',
-        Endpoint=sms_number,
+        Endpoint=user["sms_number"],
     )
     assert response["ResponseMetadata"]["HTTPStatusCode"] == 200
+    update_user_sns_subscription_status(user["id"], True)
 
 
-def subscribe_sms_number_if_not_already_subscribed(sms_number):
-    print("Checking SMS number {} for SNS subscription..".format(sms_number))
-    existing_subscriptions = get_sns_topic_subscriptions(SNS_TOPIC_ARN)
-    for subscription in existing_subscriptions:
-        if sms_number in subscription["Endpoint"]:
-            return
-    subscribe_sms_number_to_sns_topic(sms_number, SNS_TOPIC_ARN)
-
-
-def send_sms_notification(sms_number, message):
-    subscribe_sms_number_if_not_already_subscribed(sms_number)
-    print("Sending SMS notification to {}..".format(sms_number))
+def send_sms_notification(user, message):
+    if not user["sms_number_subscribed"]:
+        subscribe_user_sms_number_to_sns_topic(user, SNS_TOPIC_ARN)
+    print("Sending SMS notification to {}..".format(user["sms_number"]))
     response = SNS_CLIENT.publish(
-        PhoneNumber=sms_number,
+        PhoneNumber=user["sms_number"],
         Message=message,
     )
     assert "MessageId" in response
+    update_user_last_notified_date(user["id"], int(time.time()))

@@ -1,5 +1,5 @@
 import csv
-import datetime
+from datetime import datetime
 import os
 import sys
 import uuid
@@ -34,15 +34,15 @@ def get_users():
     assert response["ResponseMetadata"]["HTTPStatusCode"] is 200
     for user in response["Items"]:
         users.append(dict(
-            Id=user["Id"]["S"],
-            SmsNumber=user["SmsNumber"]["S"],
-            SmsNumberIsSubscribed=user["SmsNumberIsSubscribed"]["BOOL"],
-            FavouriteTeam=user["FavouriteTeam"]["S"],
-            MinutesToNotifyBeforeGameStart=(
+            id=user["Id"]["S"],
+            sms_number=user["SmsNumber"]["S"],
+            sms_number_subscribed=user["SmsNumberIsSubscribed"]["BOOL"],
+            team=user["FavouriteTeam"]["S"],
+            minutes_to_notify_before_game=(
                 int(user["MinutesToNotifyBeforeGameStart"]["N"])
             ),
-            LastNotified=(
-                datetime.datetime.fromtimestamp(int(user["LastNotified"]["N"]))
+            last_notified=(
+                datetime.fromtimestamp(int(user["LastNotified"]["N"]))
             ),
         ))
     print("{} users successfully loaded".format(len(users)))
@@ -84,3 +84,36 @@ def delete_user(user_id):
     )
     assert response["ResponseMetadata"]["HTTPStatusCode"] is 200
     print("User with ID {} was successfully deleted".format(user_id))
+
+
+def update_user_sns_subscription_status(user_id, status):
+    response = DYNAMODB_CLIENT.update_item(
+        TableName=DYNAMODB_TABLE_NAME,
+        Key={"Id": {"S": user_id}},
+        UpdateExpression="SET SmsNumberIsSubscribed = :value",
+        ExpressionAttributeValues={":value": {"BOOL": status}},
+    )
+    assert response["ResponseMetadata"]["HTTPStatusCode"] is 200
+    print(
+        "User with ID {user_id} SNS subscription "
+        "status updated to {new_status}".format(
+            user_id=user_id,
+            new_status=status,
+        )
+    )
+
+
+def update_user_last_notified_date(user_id, epoch_time):
+    response = DYNAMODB_CLIENT.update_item(
+        TableName=DYNAMODB_TABLE_NAME,
+        Key={"Id": {"S": user_id}},
+        UpdateExpression="SET LastNotified = :value",
+        ExpressionAttributeValues={":value": {"N": str(epoch_time)}},
+    )
+    assert response["ResponseMetadata"]["HTTPStatusCode"] is 200
+    print(
+        "User with ID {user_id} LastNotified updated to {new_date}".format(
+            user_id=user_id,
+            new_date=epoch_time,
+        )
+    )

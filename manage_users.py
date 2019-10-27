@@ -17,12 +17,12 @@ def print_users(users):
     ])
     for user in users:
         table.add_row([
-            user["Id"],
-            user["SmsNumber"],
-            user["SmsNumberIsSubscribed"],
-            user["FavouriteTeam"],
-            user["MinutesToNotifyBeforeGameStart"],
-            user["LastNotified"],
+            user["id"],
+            user["sms_number"],
+            user["sms_number_subscribed"],
+            user["team"],
+            user["minutes_to_notify_before_game"],
+            user["last_notified"],
         ])
     print(table)
 
