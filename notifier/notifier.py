@@ -25,14 +25,31 @@ def parse_game_date(game_date):
     return datetime.strptime(game_date, "%Y-%m-%dT%H:%M:%SZ")
 
 
+def user_was_notified_recently(user):
+    delta_seconds = (datetime.utcnow() - user["last_notified"]).total_seconds()
+    delta_hours = delta_seconds / 3600
+    return delta_hours < 12
+
+
 def time_to_notify_user(user, game):
     game_datetime_parsed = parse_game_date(game["gameDate"])
     delta_seconds = (game_datetime_parsed - datetime.utcnow()).total_seconds()
     minutes_to_game_start = delta_seconds / 60
-    return (
-        minutes_to_game_start <= int(user["MinutesBeforeGameStart"]) and
-        minutes_to_game_start > -10
+    time_to_notify = (
+        minutes_to_game_start <= user["minutes_to_notify_before_game"] and
+        not user_was_notified_recently(user)
     )
+    print(
+        "Game ID {game_id} starts in {minutes_to_start} minutes, time to "
+        "notify user {user_sms} about {user_team}? {time_to_notify}".format(
+            game_id=game["gamePk"],
+            minutes_to_start=int(minutes_to_game_start),
+            user_sms=user["sms_number"],
+            user_team=user["team"],
+            time_to_notify=time_to_notify,
+        )
+    )
+    return time_to_notify
 
 
 def convert_utc_to_est_pst_strings(date_time):
@@ -74,15 +91,17 @@ def main():
     for user in users:
         user_favorite_team_id = convert_team_abbreviation_to_id(
             teams,
-            user["FavoriteTeam"],
+            user["team"],
         )
         for game in todays_games:
             if team_is_playing(game, user_favorite_team_id):
                 if time_to_notify_user(user, game):
-                    send_sms_notification(
-                        user["SmsNumber"],
-                        generate_sms_message(game),
-                    )
+                    send_sms_notification(user, generate_sms_message(game))
 
 
-main()
+def handler(_event, _context):
+    main()
+
+
+if __name__ == "__main__":
+    main()
