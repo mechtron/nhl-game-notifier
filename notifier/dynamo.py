@@ -24,7 +24,7 @@ def get_users():
             id=user["Id"]["S"],
             sms_number=user["SmsNumber"]["S"],
             sms_number_subscribed=user["SmsNumberIsSubscribed"]["BOOL"],
-            team=user["FavouriteTeam"]["S"],
+            team=user["Team"]["S"],
             minutes_to_notify_before_game=(
                 int(user["MinutesToNotifyBeforeGameStart"]["N"])
             ),
@@ -49,7 +49,7 @@ def create_user(**kwargs):
             "SmsNumberIsSubscribed": {
                 "BOOL": False,
             },
-            "FavouriteTeam": {
+            "Team": {
                 "S": kwargs["team"],
             },
             "MinutesToNotifyBeforeGameStart": {

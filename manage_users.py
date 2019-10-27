@@ -12,7 +12,7 @@ from notifier.dynamo import (
 
 def print_users(users):
     table = PrettyTable([
-        "Id", "SmsNumber", "SmsNumberIsSubscribed", "FavouriteTeam", 
+        "Id", "SmsNumber", "SmsNumberIsSubscribed", "Team", 
         "MinutesToNotifyBeforeGameStart", "LastNotified",
     ])
     for user in users:
