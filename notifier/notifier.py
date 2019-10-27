@@ -67,7 +67,7 @@ def generate_sms_message(game):
     game_start_parsed = parse_game_date(game["gameDate"])
     game_start_strings = convert_utc_to_est_pst_strings(game_start_parsed)
     return (
-        "It's gameday! {away_team} ({away_wins}-{away_losses}-{away_ot_so}) "
+        "It's gametime! {away_team} ({away_wins}-{away_losses}-{away_ot_so}) "
         "vs {home_team} ({home_wins}-{home_losses}-{home_ot_so}) "
         "starts at {game_start_time_est} EST/{game_start_time_pst} PST"
     ).format(
